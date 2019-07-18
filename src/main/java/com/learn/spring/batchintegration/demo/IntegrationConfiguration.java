@@ -14,6 +14,7 @@ import org.springframework.integration.annotation.InboundChannelAdapter;
 import org.springframework.integration.annotation.Poller;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.file.FileReadingMessageSource;
 import org.springframework.integration.file.filters.SimplePatternFileListFilter;
@@ -22,9 +23,9 @@ import org.springframework.messaging.MessageChannel;
 import java.io.File;
 
 @Configuration
-// this annotation will be used for create a job repo and registery out of box
-//@EnableBatchProcessing
-public class IntegrationConfigura {
+@EnableIntegration
+@EnableBatchProcessing
+public class IntegrationConfiguration {
 
     @Value("${file.location}")
     private String fileLocation;
@@ -35,12 +36,13 @@ public class IntegrationConfigura {
     }
 
     @Bean
-    @InboundChannelAdapter(value = "fileInputChannel", poller = @Poller(fixedDelay = "30000"))
+    @InboundChannelAdapter(value = "fileInputChannel", poller = @Poller(fixedDelay = "3000"))
     public MessageSource<File> fileMessageSource() {
         FileReadingMessageSource source = new FileReadingMessageSource();
-        source.setDirectory(new File(fileLocation));
-        source.setFilter(new SimplePatternFileListFilter("*.csv"));
+        source.setDirectory(new File("/"));
+        source.setFilter(new SimplePatternFileListFilter("*.*"));
         source.setScanEachPoll(true);
+        source.setUseWatchService(true);
         return source;
     }
 
